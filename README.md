@@ -1,5 +1,8 @@
 # tree-sitter-mustache
 
+> [!NOTE]
+> This grammar was written entirely by an AI coding agent, for my own editor setup. I'm sharing it in case it's useful to you too, but it's maintained on a best-effort basis.
+
 A tree-sitter grammar for Mustache and Handlebars templates. It is one superset grammar for both.
 
 It parses only the `{{…}}` tags. Everything between them is a `content` node, which the queries inject as **combined** HTML. Because the grammar never parses HTML, Mustache inside start tags or attribute values cannot break the parse:
