@@ -1,0 +1,28 @@
+{
+  "grammars": [
+    {
+      "name": "mustache",
+      "camelcase": "Mustache",
+      "scope": "text.html.mustache",
+      "path": ".",
+      "file-types": ["mustache", "hbs", "handlebars"],
+      "highlights": "queries/mustache/highlights.scm",
+      "injections": "queries/mustache/injections.scm",
+      "injection-regex": "^(mustache|handlebars|hbs)$"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Mustache and Handlebars templates for tree-sitter",
+    "authors": [{ "name": "Rogin Farrer" }]
+  },
+  "bindings": {
+    "c": false,
+    "go": false,
+    "node": false,
+    "python": false,
+    "rust": false,
+    "swift": false
+  }
+}

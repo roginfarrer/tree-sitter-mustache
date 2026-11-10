@@ -1,0 +1,152 @@
+==================
+Variables and paths
+==================
+
+<p>{{name}} {{item.name}} {{../title}} {{this.[a b]}} {{@index}} {{.}}</p>
+
+---
+
+(template
+  (content)
+  (mustache_statement (path_expression (identifier)))
+  (content)
+  (mustache_statement (path_expression (identifier) (identifier)))
+  (content)
+  (mustache_statement (path_expression (identifier)))
+  (content)
+  (mustache_statement (path_expression (this) (segment_literal)))
+  (content)
+  (mustache_statement (path_expression (data) (identifier)))
+  (content)
+  (mustache_statement (path_expression))
+  (content))
+
+==================
+Helpers, hashes, sub-expressions
+==================
+
+{{icon type="ui/close" small=true class=(classes [a b]=(not x) c=1.5)}}
+
+---
+
+(template
+  (content)
+  (mustache_statement
+    (helper_invocation
+      helper: (path_expression (identifier))
+      (hash_pair key: (identifier) value: (string))
+      (hash_pair key: (identifier) value: (boolean))
+      (hash_pair
+        key: (identifier)
+        value: (sub_expression
+          helper: (path_expression (identifier))
+          (hash_pair
+            key: (segment_literal)
+            value: (sub_expression
+              helper: (path_expression (identifier))
+              argument: (path_expression (identifier))))
+          (hash_pair key: (identifier) value: (number))))))
+  (content))
+
+==================
+Mustache sections inside an HTML start tag
+==================
+
+<a href="{{href}}" {{#target}}target="{{target}}"{{/target}}>x</a>
+
+---
+
+(template
+  (content)
+  (mustache_statement (path_expression (identifier)))
+  (content)
+  (block
+    open: (block_start name: (path_expression (identifier)))
+    body: (program
+      (content)
+      (mustache_statement (path_expression (identifier)))
+      (content))
+    close: (block_end name: (path_expression (identifier))))
+  (content))
+
+==================
+Else chains, inverted sections, whitespace control
+==================
+
+{{#if a}}A{{else if (eq b "c")}}B{{else}}C{{/if}}
+{{^list}}none{{^}}some{{/list}}
+{{~ #each xs as |x i| ~}}{{x}}{{~/each~}}
+{{elsewhere}}
+
+---
+
+(template
+  (content)
+  (block
+    open: (block_start name: (path_expression (identifier)) argument: (path_expression (identifier)))
+    body: (program (content))
+    alternative: (else_clause
+      (else_statement
+        name: (path_expression (identifier))
+        argument: (sub_expression
+          helper: (path_expression (identifier))
+          argument: (path_expression (identifier))
+          argument: (string)))
+      (program (content)))
+    alternative: (else_clause (else_statement) (program (content)))
+    close: (block_end name: (path_expression (identifier))))
+  (content)
+  (block
+    open: (inverted_block_start name: (path_expression (identifier)))
+    body: (program (content))
+    alternative: (else_clause (else_statement) (program (content)))
+    close: (block_end name: (path_expression (identifier))))
+  (content)
+  (block
+    open: (block_start
+      name: (path_expression (identifier))
+      argument: (path_expression (identifier))
+      (block_params (identifier) (identifier)))
+    body: (program (mustache_statement (path_expression (identifier))))
+    close: (block_end name: (path_expression (identifier))))
+  (content)
+  (mustache_statement (path_expression (identifier)))
+  (content))
+
+==================
+Unescaped, partials, comments
+==================
+
+{{{raw}}} {{& amp}} {{ > common/flash-message.mustache foo=bar }}
+{{! short }} {{ ! spaced }} {{!-- has {{tags}} --}} {{!-- unterminated }}
+{{#> layout}}{{$title}}T{{/title}}{{/layout}}
+
+---
+
+(template
+  (content)
+  (unescaped_statement (path_expression (identifier)))
+  (content)
+  (unescaped_statement (path_expression (identifier)))
+  (content)
+  (partial_statement
+    name: (path_expression (identifier) (identifier) (identifier))
+    (hash_pair key: (identifier) value: (path_expression (identifier))))
+  (content)
+  (comment)
+  (content)
+  (comment)
+  (content)
+  (comment)
+  (content)
+  (comment)
+  (content)
+  (block
+    open: (block_start name: (path_expression (identifier)))
+    body: (program
+      (block
+        open: (block_start name: (path_expression (identifier)))
+        body: (program (content))
+        close: (block_end name: (path_expression (identifier)))))
+    close: (block_end name: (path_expression (identifier))))
+  (content))
