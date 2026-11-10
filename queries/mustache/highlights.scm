@@ -1,6 +1,18 @@
 ; All patterns use priority 110 so mustache tags draw over the injected HTML
 ; (e.g. `{{href}}` inside an `href="…"` string, which HTML highlights as @string).
 
+; Blocks (matches tree-sitter-glimmer) -------------------------------------
+; The whole opening/closing/else tag is @tag.delimiter; the patterns below
+; override the parts that have their own capture (names, arguments, …).
+
+([
+    (block_start)
+    (inverted_block_start)
+    (block_end)
+    (else_statement)
+  ] @tag.delimiter
+  (#set! priority 110))
+
 ; Delimiters ----------------------------------------------------------------
 
 ([
@@ -23,7 +35,6 @@
 ([
     "("
     ")"
-    "|"
   ] @punctuation.bracket
   (#set! priority 110))
 
@@ -89,7 +100,11 @@
   (#set! priority 110))
 
 ((block_params
-    (identifier) @variable.parameter)
+    (identifier) @variable)
+  (#set! priority 110))
+
+((block_params
+    "|" @operator)
   (#set! priority 110))
 
 ; Helpers -------------------------------------------------------------------
@@ -104,68 +119,34 @@
       (identifier) @function.call))
   (#set! priority 110))
 
-; Section / block names: the variable or helper that opens a block.
+; Block names (`if`, `each`, `is_mobile`, …) are keywords, as in glimmer.
+; Only a single-identifier name; dotted names (`features.modules`) stay @variable.
 ((block_start
     name: (path_expression
-      (identifier) @label))
+      .
+      (identifier) @keyword.conditional
+      .))
   (#set! priority 110))
 
 ((inverted_block_start
     name: (path_expression
-      (identifier) @label))
+      .
+      (identifier) @keyword.conditional
+      .))
   (#set! priority 110))
 
 ((block_end
     name: (path_expression
-      (identifier) @label))
+      .
+      (identifier) @keyword.conditional
+      .))
   (#set! priority 110))
 
 ((else_statement
     name: (path_expression
-      (identifier) @label))
-  (#set! priority 110))
-
-; Built-in Handlebars helpers.
-((block_start
-    name: (path_expression
-      (identifier) @keyword.conditional)
-    (#any-of? @keyword.conditional "if" "unless"))
-  (#set! priority 110))
-
-((block_end
-    name: (path_expression
-      (identifier) @keyword.conditional)
-    (#any-of? @keyword.conditional "if" "unless"))
-  (#set! priority 110))
-
-((else_statement
-    name: (path_expression
-      (identifier) @keyword.conditional)
-    (#any-of? @keyword.conditional "if" "unless"))
-  (#set! priority 110))
-
-((block_start
-    name: (path_expression
-      (identifier) @keyword.repeat)
-    (#eq? @keyword.repeat "each"))
-  (#set! priority 110))
-
-((block_end
-    name: (path_expression
-      (identifier) @keyword.repeat)
-    (#eq? @keyword.repeat "each"))
-  (#set! priority 110))
-
-((block_start
-    name: (path_expression
-      (identifier) @keyword)
-    (#any-of? @keyword "with" "let" "inline"))
-  (#set! priority 110))
-
-((block_end
-    name: (path_expression
-      (identifier) @keyword)
-    (#any-of? @keyword "with" "let" "inline"))
+      .
+      (identifier) @keyword.conditional
+      .))
   (#set! priority 110))
 
 ((else_statement
