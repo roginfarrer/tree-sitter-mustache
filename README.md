@@ -44,9 +44,18 @@ vim.api.nvim_create_autocmd('User', {
     }
   end,
 })
-vim.treesitter.language.register('mustache', { 'mustache', 'html.mustache', 'handlebars', 'html.handlebars' })
+
+local function register_mustache()
+  vim.treesitter.language.register('mustache', { 'mustache', 'html.mustache', 'handlebars', 'html.handlebars' })
+end
+register_mustache()
+
+-- nvim-treesitter maps `handlebars` to `glimmer` when its plugin files load,
+-- which can run after your config. Register again once that file has run.
+vim.api.nvim_create_autocmd('SourcePost', {
+  pattern = '*/nvim-treesitter/plugin/filetypes.lua',
+  callback = register_mustache,
+})
 ```
 
 The install step copies the queries into Neovim's data directory. After you change `grammar.js` or a query, run `:TSInstall! mustache`.
-
-nvim-treesitter also registers `glimmer` for `handlebars` when its plugin files load. To keep `mustache` for that filetype, register it again after that file runs, for example with a `SourcePost` autocmd on `*/nvim-treesitter/plugin/filetypes.lua`.
